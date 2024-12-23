@@ -8,11 +8,10 @@ import (
 	"os"
 	"regexp"
 	"strings"
-	"time"
 )
 
 const (
-	httpStr = "http://"
+	httpStr string = "http://"
 )
 
 func GetUrl() (string, error) {
@@ -27,6 +26,9 @@ func GetUrl() (string, error) {
 }
 
 func validateUrl(str string) string {
+	if len(str) < 10 {
+		return ""
+	}
 	res, err := regexp.MatchString("^https://*|^http://*", str)
 	fmt.Print("\n", res, "\n")
 	if err != nil {
@@ -51,7 +53,6 @@ func validateUrl(str string) string {
 			fmt.Println(err)
 		}
 	}
-	time.Sleep(5 * time.Second)
 
 	return str
 }
