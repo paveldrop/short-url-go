@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	db "short-url-go/dboperations"
+	g_short "short-url-go/genshort"
 	g_url "short-url-go/geturl"
 )
 
@@ -13,10 +14,13 @@ func main() {
 	} else {
 		fmt.Println(link)
 	}
+	shortLink := g_short.ShortURL(link)
 	linkToAdd := &db.Link{
-		ShortURL: link,
+		ShortURL: shortLink,
 		FullURL:  link,
 	}
 	db.AddLink(linkToAdd)
-	db.PrintDB()
+	db.GetShortURl(link)
 }
+
+// https://stackoverflow.com/questions/21160258/golang-generating-a-32-byte-key?rq=3

@@ -43,3 +43,33 @@ func PrintDB() {
 		fmt.Println(link)
 	}
 }
+
+func ValidateShortInBD(shortURL string) (bool, error) {
+	result := true
+	db := ConnectToDB()
+	var links Link
+	shortInBD := db.Table("links").Find(&links)
+	if shortInBD.Error != nil {
+		result = false
+		return result, shortInBD.Error
+	}
+	for _, link := range links.ShortURL {
+		if string(link) == shortURL {
+			result = false
+			return result, nil
+		}
+	}
+	return result, nil
+}
+
+func GetShortURl(fullURL string) (string, error) {
+	db := ConnectToDB()
+	var result Link
+	db.Where("full_url = ?", fullURL).Find(&result)
+	if result.ShortURL == "" {
+		return "", fmt.Errorf("error: not find shortlink in db")
+	}
+	shortURL := result.ShortURL
+	fmt.Println(shortURL)
+	return shortURL, nil
+}
