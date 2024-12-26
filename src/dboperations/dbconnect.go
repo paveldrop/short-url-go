@@ -47,18 +47,13 @@ func PrintDB() {
 func ValidateShortInBD(shortURL string) (bool, error) {
 	result := true
 	db := ConnectToDB()
-	var links Link
-	shortInBD := db.Table("links").Find(&links)
-	if shortInBD.Error != nil {
+	var result_link Link
+	db.Where("short_url = ?", shortURL[:6]).First(&result_link)
+	if result_link.ShortURL == shortURL {
 		result = false
-		return result, shortInBD.Error
+		return result, nil
 	}
-	for _, link := range links.ShortURL {
-		if string(link) == shortURL {
-			result = false
-			return result, nil
-		}
-	}
+	fmt.Println(result_link.ShortURL, result_link.FullURL, "you are here")
 	return result, nil
 }
 

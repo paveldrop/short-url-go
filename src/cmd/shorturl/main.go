@@ -11,9 +11,9 @@ func main() {
 	link, err := g_url.GetUrl()
 	if err != nil {
 		fmt.Println(err)
-	} else {
-		fmt.Println(link)
+		return
 	}
+
 	shortLink := g_short.ShortURL(link)
 	linkToAdd := &db.Link{
 		ShortURL: shortLink,

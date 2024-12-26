@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	httpStr string = "http://"
+	httpStr  string = "http://"
+	matchStr string = "^https://*|^http://*"
 )
 
 func GetUrl() (string, error) {
@@ -21,40 +22,42 @@ func GetUrl() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	validateUrl(text)
+	_, err = validateUrl(text)
+	if err != nil {
+		return "", err
+	}
 	return text, nil
 }
 
-func validateUrl(str string) string {
+func validateUrl(str string) (bool, error) {
 	if len(str) < 10 {
-		return ""
+		return false, fmt.Errorf("link less 10 chars")
 	}
-	res, err := regexp.MatchString("^https://*|^http://*", str)
+	res, err := regexp.MatchString(matchStr, str)
 	fmt.Print("\n", res, "\n")
 	if err != nil {
 		fmt.Println(err)
-		return ""
+		return false, fmt.Errorf("error in regex: %v", err)
 	}
 	if res {
 		if succes, err := getResponse(str); succes {
 			fmt.Println(str)
-			return str
+			return true, nil
 		} else {
 			fmt.Println(err)
-			return ""
+			return false, fmt.Errorf("response code not supported\nCode:%v", err)
 		}
 	} else {
 		str = httpStr + str
 		fmt.Println(str)
 		if succes, err := getResponse(str); succes {
 			fmt.Println(str)
-			return str
+			return true, nil
 		} else {
 			fmt.Println(err)
+			return false, fmt.Errorf("response code not supported\nCode:%v", err)
 		}
 	}
-
-	return str
 }
 
 func getResponse(url string) (bool, error) {
@@ -75,13 +78,6 @@ func getResponse(url string) (bool, error) {
 	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0")
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Accept-Language", "en-US,en;q=0.5")
-	// req.Header.Set("Accept-Encoding", "gzip, deflate, br")
-	// req.Header.Set("Connection", "keep-alive")
-	// req.Header.Set("Upgrade-Insecure-Requests", "1")
-	// req.Header.Set("Sec-Fetch-Dest", "document")
-	// req.Header.Set("Sec-Fetch-Mode", "navigate")
-	// req.Header.Set("Sec-Fetch-Site", "none")
-	// req.Header.Set("Sec-Fetch-User", "?1")
 
 	resp, err := client.Do(req)
 	if err != nil {
