@@ -14,7 +14,7 @@ func main() {
 		return
 	}
 
-	shortLink := g_short.ShortURL(link)
+	shortLink, _ := g_short.ShortURL(link)
 	linkToAdd := &db.Link{
 		ShortURL: shortLink,
 		FullURL:  link,

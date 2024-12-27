@@ -1,31 +1,25 @@
 package genshort
 
 import (
-	"encoding/base64"
-	"fmt"
-	"math/rand"
-	db "short-url-go/dboperations"
-	"strconv"
+	"crypto/rand"
+	"math/big"
 )
 
 const (
-	sugar string = "sUgAr"
+	length   int    = 6
+	alphabet string = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 )
 
-func ShortURL(url string) string {
-
-	shortURL := base64.StdEncoding.EncodeToString([]byte(url))
-	fmt.Println(shortURL[:6])
-	randomNum := strconv.Itoa(rand.Int())
-	result, err := db.ValidateShortInBD(shortURL[:6])
-	if err != nil {
-		fmt.Printf("error in valid short link: %v", err)
+func ShortURL(url string) (string, error) {
+	result := make([]byte, length)
+	for i := 0; i < length; i++ {
+		random, err := rand.Int(rand.Reader, big.NewInt(62))
+		if err != nil {
+			return "", err
+		}
+		index := int(random.Int64())
+		result[i] = alphabet[index]
 	}
-	if result {
-		return shortURL[:6]
-	} else {
-		shortURL = base64.StdEncoding.EncodeToString([]byte(shortURL + randomNum))
-		fmt.Printf("gen new short link\n%s", shortURL[:6])
-		return shortURL[:6]
-	}
+	// fmt.Println(string(result))
+	return string(result), nil
 }
