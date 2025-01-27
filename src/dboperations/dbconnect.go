@@ -68,3 +68,17 @@ func GetShortURl(fullURL string) (string, error) {
 	fmt.Println(shortURL)
 	return shortURL, nil
 }
+
+func GetAllShortLinks() ([]Link, error) {
+	db := ConnectToDB()
+	var shortURL []string
+	var result []Link
+	db.Select([]string{"ShortURL", "FullURL"}).Find(&result)
+	if len(result) < 1 {
+		return nil, fmt.Errorf("not found short url links")
+	}
+	for i := 0; i < len(result); i++ {
+		shortURL = append(shortURL, result[i].ShortURL)
+	}
+	return result, nil
+}
