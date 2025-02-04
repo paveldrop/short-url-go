@@ -3,21 +3,26 @@ package dboperations
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 type Link struct {
-	ID       uint   `gorm:"primaryKey"`
-	FullURL  string `gorm:"type:varchar(255)"`
-	ShortURL string `gorm:"type:varchar(255)"`
-	// Created string `gorm:"type:varchar(100)"`
+	ID       uint      `gorm:"primaryKey"`
+	FullURL  string    `gorm:"type:varchar(255)"`
+	ShortURL string    `gorm:"type:varchar(255)"`
+	Created  time.Time `gorm:"type:datetime;default:CURRENT_TIMESTAMP"`
 }
 
 func ConnectToDB() *gorm.DB {
-	dsn := "root:secret@tcp(localhost:3306)/shortlink?charset=utf8&parseTime=True&loc=Local"
+	dsn := "root:mysecretpassword@tcp(localhost:3306)/shortlink?charset=utf8&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+	err = db.AutoMigrate(&Link{})
 	if err != nil {
 		panic(err)
 	}
