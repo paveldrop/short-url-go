@@ -20,6 +20,5 @@ func ShortURL(url string) (string, error) {
 		index := int(random.Int64())
 		result[i] = alphabet[index]
 	}
-	// fmt.Println(string(result))
 	return string(result), nil
 }
