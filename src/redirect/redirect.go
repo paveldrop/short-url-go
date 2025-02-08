@@ -1,6 +1,7 @@
 package redirect
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -28,6 +29,7 @@ func AddLink(link db.Link) {
 func StartServer() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", loadTemplate)
+	mux.HandleFunc("/create-link", createLinkHandler)
 	_ = RedirectFromShort()
 	log.Println("Server started on port :8084")
 	if err := http.ListenAndServe(":8084", mux); err != nil {
@@ -51,4 +53,24 @@ func loadTemplate(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		http.Error(w, "Internal Server Error", 500)
 	}
+}
+
+func createLinkHandler(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	r.ParseForm()
+
+	name := r.FormValue("name")
+	if name == "" {
+		fmt.Fprint(w, "Please provide a valid URL.")
+		return
+	}
+	log.Printf("Received URL: %s\n", name)
+
+	// shortURL := generateShortURL(name)
+
+	fmt.Fprintf(w, "Your short URL is: %s", "shortURL")
 }
