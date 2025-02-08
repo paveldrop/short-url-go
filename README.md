@@ -6,4 +6,5 @@ TO DO:
 - shortlinks
 - server
 - ~~create html template~~
-- connect template
+- ~~connect template~~
+- connect func 'add new link -- get new link'
