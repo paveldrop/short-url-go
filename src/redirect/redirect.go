@@ -1,8 +1,7 @@
 package redirect
 
 import (
-	// "net/http"
-
+	"html/template"
 	"log"
 	"net/http"
 	db "short-url-go/dboperations"
@@ -27,15 +26,29 @@ func AddLink(link db.Link) {
 }
 
 func StartServer() {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", loadTemplate)
 	_ = RedirectFromShort()
 	log.Println("Server started on port :8084")
-	if err := http.ListenAndServe(":8084", nil); err != nil {
+	if err := http.ListenAndServe(":8084", mux); err != nil {
 		log.Fatal(err)
 	}
 }
 
-// func AddLinkToHandle(link db.Link) {
-// 	http.HandleFunc("/"+link.ShortURL, func(w http.ResponseWriter, r *http.Request) {
-// 		http.Redirect(w, r, link.FullURL, http.StatusFound)
-// 	})
-// }
+func loadTemplate(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+	template, err := template.ParseFiles("../../template/home.tmpl")
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+		return
+	}
+	err = template.Execute(w, nil)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+	}
+}
