@@ -17,6 +17,9 @@
                     <input type="submit" value="Create link!" />
                 </div>
             </form>
+            {{if .ShortURL}}
+                <p>Short URL: <a href="{{.ShortURL}}">{{.ShortURL}}</a></p>
+            {{end}}
         </main>
     </body>
 </html>

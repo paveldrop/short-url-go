@@ -8,6 +8,10 @@ import (
 	db "short-url-go/dboperations"
 )
 
+type PageData struct {
+	ShortURL string
+}
+
 func RedirectFromShort() error {
 	links, err := db.GetAllShortLinks()
 	if err != nil {
@@ -42,13 +46,17 @@ func loadTemplate(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
+	var pageData PageData
+	if r.Method == "GET" && r.URL.Query().Get("short") != "" {
+		pageData.ShortURL = r.URL.Query().Get("short")
+	}
 	template, err := template.ParseFiles("../../template/home.tmpl")
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, "Internal Server Error", 500)
 		return
 	}
-	err = template.Execute(w, nil)
+	err = template.Execute(w, pageData)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, "Internal Server Error", 500)
@@ -68,9 +76,29 @@ func createLinkHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Please provide a valid URL.")
 		return
 	}
-	log.Printf("Received URL: %s\n", name)
+	pageData := PageData{
+		ShortURL: "test", // reform to generate link
+	}
+
+	// log.Printf("Received URL: %s\n", name)
 
 	// shortURL := generateShortURL(name)
 
-	fmt.Fprintf(w, "Your short URL is: %s", "shortURL")
+	// save shortlink in DB
+
+	// add redirect to shortlink
+
+	template, err := template.ParseFiles("../../template/home.tmpl")
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+		return
+	}
+	err = template.Execute(w, pageData)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+	}
+
+	// fmt.Fprintf(w, "Your short URL is: %s", "shortURL")
 }
